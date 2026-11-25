@@ -33,14 +33,12 @@
   <main class="desk">
     <section class="center" aria-label="猜词主舞台">
       <div class="stage">
-        <div class="stage-top"><span id="round-label">第 1 轮</span><span class="status"><i></i><span id="round-state" role="status">待开始</span></span></div>
-        <div class="prompt"><span class="prompt-label">本轮关键词</span><button type="button" id="edit-word" title="编辑关键词" aria-haspopup="dialog" aria-labelledby="word edit-label"><strong id="word">囚牛</strong><svg aria-hidden="true"><use href="#pencil"/></svg><span id="edit-label" class="sr-only">编辑关键词</span></button></div>
+        <span id="round-state" role="status"></span>
+        <div class="prompt"><button type="button" id="edit-word" title="编辑关键词" aria-haspopup="dialog" aria-labelledby="word edit-label"><strong id="word">囚牛</strong><svg aria-hidden="true"><use href="#pencil"/></svg><span id="edit-label" class="sr-only">编辑关键词</span></button></div>
         <div class="timing">
-          <div id="clock-caption">本轮限时</div>
           <button type="button" id="toggle-clock" aria-label="开始计时" aria-keyshortcuts="Space">
             <span id="clock" role="timer" aria-live="off">100 秒</span>
           </button>
-          <p id="clock-hint">点击时间或按空格开始</p>
         </div>
         <progress id="progress" max="1" value="1" aria-label="剩余时间比例"></progress>
       </div>

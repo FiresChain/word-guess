@@ -5,7 +5,6 @@
   const resultLabels = { win: '猜中', loss: '未猜出', timeout: '没猜出来' };
   const defaultDuration = 100;
   const toggleClock = document.querySelector('#toggle-clock');
-  const clockHint = document.querySelector('#clock-hint');
   const editWord = document.querySelector('#edit-word');
   const keywordDialog = document.querySelector('#keyword-dialog');
   const keywordForm = document.querySelector('#keyword-form');
@@ -18,8 +17,6 @@
   const cancelSettings = document.querySelector('#cancel-settings');
   const word = document.querySelector('#word');
   const clock = document.querySelector('#clock');
-  const clockCaption = document.querySelector('#clock-caption');
-  const roundLabel = document.querySelector('#round-label');
   const roundState = document.querySelector('#round-state');
   const progress = document.querySelector('#progress');
   const historyList = document.querySelector('#history-list');
@@ -116,32 +113,27 @@
     editWord.disabled = activeRound !== null;
     const action = activeRound ? '结束并记录猜中' : (finishedRound ? '开始下一轮' : '开始计时');
     toggleClock.setAttribute('aria-label', action);
-    clockHint.textContent = `点击时间或按空格${action}`;
-    roundLabel.textContent = `第 ${round?.number ?? (history[0]?.number ?? 0) + 1} 轮`;
     const displayWord = round?.word ?? (confirmedWord || '请输入词条');
     word.textContent = displayWord;
 
     if (activeRound) {
       roundState.dataset.state = 'running';
-      roundState.textContent = '进行中';
-      clockCaption.textContent = '剩余时间';
+      roundState.textContent = '';
       return;
     }
 
     if (finishedRound) {
       const remaining = round.limitMs - round.elapsedMs;
       roundState.dataset.state = round.result;
-      roundState.textContent = resultLabels[round.result];
+      roundState.textContent = round.result === 'timeout' ? resultLabels.timeout : '';
       clock.textContent = formatSeconds(round.result === 'timeout' ? 0 : round.elapsedMs);
-      clockCaption.textContent = round.result === 'timeout' ? '时间到 · 没猜出来' : '本轮用时';
       progress.value = remaining / round.limitMs;
       return;
     }
 
     roundState.dataset.state = 'ready';
-    roundState.textContent = '待开始';
+    roundState.textContent = '';
     clock.textContent = `${preferredDuration} 秒`;
-    clockCaption.textContent = '本轮限时';
     progress.value = 1;
   }
 

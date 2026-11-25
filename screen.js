@@ -9,13 +9,16 @@
 
   function fitWord() {
     if (!editWord.clientHeight) return;
-    // Measure the rendered text so mixed scripts, punctuation and wrapped lines all fit.
+    // Measure the rendered text so mixed scripts and punctuation fit on one line.
+    const text = document.createRange();
+    text.selectNodeContents(word);
     let low = 1;
     let high = Math.ceil(editWord.clientHeight);
     while (low < high) {
       const size = Math.ceil((low + high) / 2);
       word.style.setProperty('--stage-word-size', size + 'px');
-      if (word.offsetHeight <= editWord.clientHeight && word.scrollWidth <= word.clientWidth) low = size;
+      const bounds = text.getBoundingClientRect();
+      if (bounds.height <= editWord.clientHeight && bounds.width <= word.clientWidth) low = size;
       else high = size - 1;
     }
     word.style.setProperty('--stage-word-size', low + 'px');
