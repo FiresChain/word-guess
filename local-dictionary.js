@@ -12,8 +12,8 @@
       throw new Error("关键词必须为 1 到 40 个字符。");
     }
     if (/[\r\n]/.test(entry.keyword.trim())) throw new Error("关键词只能占一行。");
-    if (typeof entry.description !== "string" || !entry.description.trim()) {
-      throw new Error("请填写词条描述。");
+    if (typeof entry.description !== "string") {
+      throw new Error("描述应为文本，待补写时可使用空字符串。");
     }
     return { keyword: entry.keyword.trim(), description: entry.description.trim() };
   }

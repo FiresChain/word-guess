@@ -7,6 +7,8 @@
   const entry = document.querySelector("#entry");
   const onlineButton = document.querySelector("#lookup-online");
 
+  const missingButton = document.querySelector("#lookup-missing");
+
   const wikidata = "https://www.wikidata.org";
   const languages = ["zh-hans", "zh-cn", "zh", "zh-hant", "zh-tw", "en", "mul"];
   const factProperties = [
@@ -67,7 +69,7 @@
     const heading = element("h3", title);
     heading.id = "entry-title";
     entry.append(heading);
-    if (description) entry.append(element("p", description, card.custom ? "custom-description" : ""));
+    if (description || card.custom) entry.append(element("p", description || "描述待补充", card.custom ? "custom-description" : ""));
     if (aliases?.length) entry.append(element("p", `别名：${aliases.join("、")}`, "aliases"));
     if (facts?.length) {
       const list = element("dl");
@@ -358,6 +360,9 @@
     renderCard();
     onlineButton.hidden = true;
     const custom = window.localDictionary.find(term);
+    missingButton.disabled = Boolean(custom);
+    missingButton.textContent = custom ? "已加入本地词库" : "找不到";
+    missingButton.title = custom ? "可在设置的本地词库中编辑" : "将当前关键词加入本地词库";
     if (custom) {
       const option = { card: { title: custom.keyword, description: custom.description, custom: true }, complete: true };
       lookup.options.push(option);
@@ -385,6 +390,14 @@
   document.addEventListener("dictionary-changed", () => {
     const { term } = currentLookup;
     if (currentLookup.options.some(option => option.card.custom) || window.localDictionary.find(term)) lookupWord(term);
+  });
+
+  missingButton.addEventListener("click", () => {
+    try {
+      window.localDictionary.save({ keyword: currentLookup.term, description: "" });
+    } catch (error) {
+      status.textContent = error.message;
+    }
   });
 
   onlineButton.addEventListener("click", () => {

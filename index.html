@@ -54,7 +54,10 @@
         <div id="switcher-label">切换词条</div>
         <div id="results" role="group" aria-labelledby="switcher-label"></div>
       </div>
-      <button id="lookup-online" type="button" hidden>查找更多 Wikidata 词条</button>
+      <div class="lookup-actions">
+        <button id="lookup-online" type="button" hidden>查找更多 Wikidata 词条</button>
+        <button id="lookup-missing" type="button" title="将当前关键词加入本地词库">找不到</button>
+      </div>
       <article id="entry" aria-labelledby="entry-title" hidden></article>
     </aside>
   </main>
@@ -88,6 +91,7 @@
             <h3 id="dictionary-list-title">已保存词条</h3>
             <button id="dictionary-new" type="button">新增</button>
           </div>
+          <label class="dictionary-filter"><input id="dictionary-undescribed" type="checkbox">仅看无描述</label>
           <p id="dictionary-empty" class="dictionary-note">还没有本地词条</p>
           <ul id="dictionary-list"></ul>
         </section>
@@ -96,7 +100,7 @@
           <label for="dictionary-keyword">关键词</label>
           <input id="dictionary-keyword" type="text" maxlength="40" autocomplete="off" required>
           <label for="dictionary-description">描述</label>
-          <textarea id="dictionary-description" rows="5" required></textarea>
+          <textarea id="dictionary-description" rows="5"></textarea>
           <div id="dictionary-edit-actions" class="dictionary-edit-actions">
             <button id="dictionary-delete" class="dictionary-danger" type="button" hidden>删除词条</button>
             <button class="primary" type="submit">保存词条</button>

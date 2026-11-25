@@ -9,6 +9,7 @@
   const title = document.querySelector('#dictionary-title');
   const editorTitle = document.querySelector('#dictionary-editor-title');
   const list = document.querySelector('#dictionary-list');
+  const undescribed = document.querySelector('#dictionary-undescribed');
   const empty = document.querySelector('#dictionary-empty');
   const form = document.querySelector('#dictionary-form');
   const keyword = document.querySelector('#dictionary-keyword');
@@ -49,7 +50,7 @@
   }
 
   function renderEntries() {
-    const entries = dictionary.list();
+    const entries = dictionary.list().filter(entry => !undescribed.checked || !entry.description);
     const items = document.createDocumentFragment();
     for (const entry of entries) {
       const item = document.createElement('li');
@@ -69,6 +70,7 @@
     list.replaceChildren(items);
     list.scrollTop = scrollTop;
     empty.hidden = entries.length > 0;
+    empty.textContent = undescribed.checked ? '没有待补充描述的词条' : '还没有本地词条';
   }
 
   function showSettings() {
@@ -95,6 +97,14 @@
     title.focus();
   });
 
+  undescribed.addEventListener('change', () => {
+    try {
+      renderEntries();
+    } catch (error) {
+      showStatus(error.message, true);
+    }
+  });
+
   document.querySelector('#back-settings').addEventListener('click', () => {
     showSettings();
     openDictionary.focus();
@@ -115,7 +125,7 @@
     const entry = { keyword: keyword.value.trim(), description: description.value.trim() };
     try {
       dictionary.save(entry, selectedEntry?.keyword ?? null);
-      editEntry(entry);
+      editEntry(undescribed.checked && entry.description ? undefined : entry);
       renderEntries();
       showStatus('词条已保存。');
     } catch (error) {
