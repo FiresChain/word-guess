@@ -3,6 +3,7 @@
 
   const status = document.querySelector("#lookup-status");
   const results = document.querySelector("#results");
+  const switcher = document.querySelector("#lookup-switcher");
   const entry = document.querySelector("#entry");
   const onlineButton = document.querySelector("#lookup-online");
 
@@ -104,7 +105,7 @@
       Array.isArray(fact) && typeof fact[0] === "string" && Array.isArray(fact[1]) &&
       fact[1].length && fact[1].every(value => typeof value === "string")
     ) : [];
-    return { id: card.id, title: card.title, description, aliases, facts };
+    return { id: card.id, title: card.title, description, aliases, facts, summaryOnly: card.summaryOnly === true };
   }
 
   function readCache() {
@@ -115,10 +116,12 @@
     }
   }
 
-  function saveCard(card) {
-    savedCards.delete(card.id);
-    savedCards.set(card.id, card);
-    if (savedCards.size > cacheLimit) savedCards.delete(savedCards.keys().next().value);
+  function saveCards(cards) {
+    for (const card of cards) {
+      if (card.summaryOnly && savedCards.has(card.id)) continue;
+      savedCards.set(card.id, card);
+      if (savedCards.size > cacheLimit) savedCards.delete(savedCards.keys().next().value);
+    }
     try {
       localStorage.setItem(cacheKey, JSON.stringify([...savedCards.values()]));
     } catch {
@@ -147,14 +150,13 @@
     const items = new Map(savedCards);
     for (const card of catalog || []) items.set(card.id, card);
     return exactMatches([starterCard, ...items.values()], term)
-      .slice(0, 6)
-      .map(card => ({ card, complete: true }));
+      .map(card => ({ card, complete: !card.summaryOnly }));
   }
 
   function renderOptions(lookup) {
     results.replaceChildren();
-    results.hidden = lookup.options.length < 2;
-    if (results.hidden) return;
+    switcher.hidden = lookup.options.length < 2;
+    if (switcher.hidden) return;
 
     for (const option of lookup.options) {
       const button = element("button", "", "result-option");
@@ -162,7 +164,8 @@
       button.setAttribute("aria-pressed", String(option === lookup.selected));
       button.setAttribute("aria-controls", "entry");
       button.append(element("strong", option.card.title));
-      if (option.card.description) button.append(element("span", option.card.description));
+      const source = option.card.custom ? "本地词库" : option.card.id ? "Wikidata" : "内置词条";
+      button.append(element("span", [source, option.card.description || option.card.id].filter(Boolean).join(" · ")));
       button.addEventListener("click", () => {
         cancelOnline();
         selectOption(lookup, option);
@@ -183,8 +186,9 @@
   }
 
   function resetOnlineButton(lookup) {
-    onlineButton.textContent = "查找更多 Wikidata 词条";
-    onlineButton.hidden = lookup.onlineOffset === null;
+    const needsDetails = lookup.selected && !lookup.selected.complete;
+    onlineButton.textContent = needsDetails ? "加载词条详情" : "查找更多 Wikidata 词条";
+    onlineButton.hidden = !needsDetails && lookup.onlineOffset === null;
   }
 
   function cancelOnline() {
@@ -290,7 +294,8 @@
       renderCard(card);
     }
     option.complete = true;
-    saveCard(card);
+    resetOnlineButton(currentLookup);
+    saveCards([card]);
     status.textContent = "";
   }
 
@@ -327,6 +332,7 @@
         });
       const additional = exactMatches(candidates, lookup.term).map(card => ({ card, complete: false }));
       if (additional.length) {
+        saveCards(additional.map(({ card }) => ({ ...card, summaryOnly: true })));
         lookup.options.push(...additional);
         if (!lookup.selected) selectOption(lookup, additional[0]);
         renderOptions(lookup);
@@ -353,17 +359,19 @@
     onlineButton.hidden = true;
     const custom = window.localDictionary.find(term);
     if (custom) {
-      lookup.selected = { card: { title: custom.keyword, description: custom.description, custom: true }, complete: true };
-      renderCard(lookup.selected.card);
+      const option = { card: { title: custom.keyword, description: custom.description, custom: true }, complete: true };
+      lookup.options.push(option);
+      lookup.selected = option;
+      renderCard(option.card);
       status.textContent = "";
-      return;
+    } else {
+      status.textContent = "正在查找已收录词条…";
     }
-    status.textContent = "正在查找已收录词条…";
 
     const catalog = await catalogReady;
     if (currentLookup !== lookup) return;
     lookup.localAvailable = catalog !== null;
-    lookup.options = findLocal(term, catalog);
+    lookup.options.push(...findLocal(term, catalog));
 
     if (lookup.options.length) {
       selectOption(lookup, lookup.options[0]);
@@ -375,8 +383,8 @@
 
   document.addEventListener("word-confirmed", event => lookupWord(event.detail));
   document.addEventListener("dictionary-changed", () => {
-    const { term, selected } = currentLookup;
-    if (selected?.card.custom || window.localDictionary.find(term)) lookupWord(term);
+    const { term } = currentLookup;
+    if (currentLookup.options.some(option => option.card.custom) || window.localDictionary.find(term)) lookupWord(term);
   });
 
   onlineButton.addEventListener("click", () => {

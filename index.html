@@ -50,9 +50,12 @@
     <aside class="lookup panel" aria-labelledby="lookup-title">
       <div class="section-heading"><svg aria-hidden="true"><use href="#book"/></svg><h2 id="lookup-title">查词手册</h2></div>
       <p id="lookup-status" role="status"></p>
-      <div id="results" role="group" aria-label="匹配词条" hidden></div>
-      <article id="entry" aria-labelledby="entry-title" hidden></article>
+      <div id="lookup-switcher" hidden>
+        <div id="switcher-label">切换词条</div>
+        <div id="results" role="group" aria-labelledby="switcher-label"></div>
+      </div>
       <button id="lookup-online" type="button" hidden>查找更多 Wikidata 词条</button>
+      <article id="entry" aria-labelledby="entry-title" hidden></article>
     </aside>
   </main>
   <dialog id="keyword-dialog" aria-labelledby="keyword-title">

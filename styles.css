@@ -110,7 +110,8 @@ dialog label:not(h2 label) { display:block; margin-bottom:6px; color:var(--muted
 .dictionary-transfer pre,.dictionary-transfer code { font-family:inherit }
 .dictionary-transfer pre { margin:5px 0 0; padding:8px; border-radius:6px; background:#f2f3eb; white-space:pre-wrap; overflow-wrap:anywhere }
 #lookup-status:not(:empty) { margin-top:8px }
-#results { margin:8px -4px 0; padding:4px; max-height:236px; overflow:auto }
+#switcher-label { margin-top:12px; font-size:var(--caption); color:var(--muted) }
+#results { margin:2px -4px 0; padding:4px; max-height:236px; overflow:auto }
 .result-option { text-align:left; display:block; width:100%; padding:7px 10px; overflow-wrap:anywhere }
 .result-option+.result-option { margin-top:4px }
 .result-option strong,.result-option span { display:block }
