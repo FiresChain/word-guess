@@ -167,7 +167,7 @@
       const result = document.createElement('span');
       result.className = 'history-result';
       result.textContent = resultLabels[round.result];
-      item.append(number, entry, elapsed, result);
+      item.append(number, entry, result, elapsed);
       items.append(item);
     }
 
