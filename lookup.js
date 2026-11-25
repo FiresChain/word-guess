@@ -130,25 +130,25 @@
     return value.normalize("NFKC").trim().replace(/\s+/g, " ").toLowerCase();
   }
 
-  function matchRank(card, term) {
-    const title = normalize(card.title);
-    const otherNames = [...(card.aliases || []), card.id || ""].map(normalize);
-    if (title === term) return 0;
-    if (otherNames.includes(term)) return 1;
-    if ([title, ...otherNames].some(name => name.startsWith(term))) return 2;
-    return Infinity;
+  function exactMatches(cards, term) {
+    const key = normalize(term);
+    const titles = [];
+    const alternatives = [];
+    for (const card of cards) {
+      if (normalize(card.title) === key) titles.push(card);
+      else if (normalize(card.id || "") === key || card.aliases?.some(name => normalize(name) === key)) {
+        alternatives.push(card);
+      }
+    }
+    return [...titles, ...alternatives];
   }
 
   function findLocal(term, catalog) {
-    const normalized = normalize(term);
     const items = new Map(savedCards);
     for (const card of catalog || []) items.set(card.id, card);
-    return [starterCard, ...items.values()]
-      .map(card => ({ card, rank: matchRank(card, normalized) }))
-      .filter(({ rank }) => Number.isFinite(rank))
-      .sort((a, b) => a.rank - b.rank)
+    return exactMatches([starterCard, ...items.values()], term)
       .slice(0, 6)
-      .map(({ card }) => ({ card, complete: true }));
+      .map(card => ({ card, complete: true }));
   }
 
   function renderOptions(lookup) {
@@ -274,7 +274,7 @@
       .filter(alias => alias && alias !== title);
     const card = {
       id: isItemId(item.id) ? item.id : summary.id,
-      title, description, aliases: [...new Set(aliases)].slice(0, 6)
+      title, description, aliases: [...new Set([...(summary.aliases || []), ...aliases])].filter(alias => alias !== title).slice(0, 6)
     };
     option.card = card;
     renderCard(card);
@@ -317,12 +317,15 @@
       signal.throwIfAborted();
       lookup.onlineOffset = Number.isInteger(data["search-continue"]) ? data["search-continue"] : null;
       const present = new Set(lookup.options.map(option => option.card.id));
-      const additional = (data.search || [])
+      const candidates = (data.search || [])
         .filter(hit => isItemId(hit.id) && typeof hit.label === "string" && hit.label && !present.has(hit.id))
-        .map(hit => ({
-          card: { id: hit.id, title: hit.label, description: hit.description },
-          complete: false
-        }));
+        .map(hit => {
+          const names = [...(hit.aliases || [])];
+          if (["alias", "label"].includes(hit.match?.type)) names.push(hit.match.text);
+          const aliases = names.filter(name => typeof name === "string" && name !== hit.label);
+          return { id: hit.id, title: hit.label, description: hit.description, aliases };
+        });
+      const additional = exactMatches(candidates, lookup.term).map(card => ({ card, complete: false }));
       if (additional.length) {
         lookup.options.push(...additional);
         if (!lookup.selected) selectOption(lookup, additional[0]);
@@ -330,7 +333,9 @@
       }
       resetOnlineButton(lookup);
       if (!additional.length) {
-        status.textContent = lookup.selected ? "Wikidata 暂无更多匹配结果。" : `${prefix}Wikidata 暂无匹配结果。`;
+        status.textContent = lookup.onlineOffset !== null
+          ? "当页没有更多完全匹配的词条，可继续查找。"
+          : `${prefix}Wikidata 没有更多完全匹配的词条。`;
       } else if (lookup.selected.complete) {
         status.textContent = `Wikidata 找到 ${additional.length} 条额外结果。`;
       } else {
