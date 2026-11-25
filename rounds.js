@@ -2,9 +2,10 @@
   'use strict';
 
   const storageKey = 'word-guess.rounds.v1';
-  const resultLabels = { win: '猜中', loss: '未猜出', timeout: '超时' };
+  const resultLabels = { win: '猜中', loss: '未猜出', timeout: '没猜出来' };
   const defaultDuration = 100;
-  const setup = document.querySelector('#setup');
+  const toggleClock = document.querySelector('#toggle-clock');
+  const clockHint = document.querySelector('#clock-hint');
   const editWord = document.querySelector('#edit-word');
   const keywordDialog = document.querySelector('#keyword-dialog');
   const keywordForm = document.querySelector('#keyword-form');
@@ -21,9 +22,6 @@
   const roundLabel = document.querySelector('#round-label');
   const roundState = document.querySelector('#round-state');
   const progress = document.querySelector('#progress');
-  const playActions = document.querySelector('#play-actions');
-  const won = document.querySelector('#won');
-  const failed = document.querySelector('#failed');
   const historyList = document.querySelector('#history-list');
   const historyEmpty = document.querySelector('#history-empty');
   const historyCount = document.querySelector('#history-count');
@@ -103,8 +101,8 @@
     }
   }
 
-  function formatElapsed(ms) {
-    return `${(Math.floor(ms / 10) / 100).toFixed(2)} 秒`;
+  function formatSeconds(ms) {
+    return `${(ms / 1000).toFixed(3)} 秒`;
   }
 
   function lookupConfirmedWord() {
@@ -117,9 +115,10 @@
 
   function renderRound() {
     const round = activeRound ?? finishedRound;
-    setup.hidden = activeRound !== null;
-    playActions.hidden = activeRound === null;
     editWord.disabled = activeRound !== null;
+    const action = activeRound ? '结束并记录猜中' : (finishedRound ? '开始下一轮' : '开始计时');
+    toggleClock.setAttribute('aria-label', action);
+    clockHint.textContent = `点击时间或按空格${action}`;
     roundLabel.textContent = `第 ${round?.number ?? (history[0]?.number ?? 0) + 1} 轮`;
     const displayWord = round?.word ?? (confirmedWord || '请输入词条');
     word.textContent = displayWord;
@@ -136,8 +135,8 @@
       const remaining = round.limitMs - round.elapsedMs;
       roundState.dataset.state = round.result;
       roundState.textContent = resultLabels[round.result];
-      clock.textContent = formatElapsed(round.elapsedMs);
-      clockCaption.textContent = `本轮用时 · 剩余 ${formatElapsed(remaining)}`;
+      clock.textContent = formatSeconds(round.result === 'timeout' ? 0 : round.elapsedMs);
+      clockCaption.textContent = round.result === 'timeout' ? '时间到 · 没猜出来' : '本轮用时';
       progress.value = remaining / round.limitMs;
       return;
     }
@@ -165,7 +164,7 @@
       entry.textContent = round.word;
       const elapsed = document.createElement('span');
       elapsed.className = 'history-time';
-      elapsed.textContent = formatElapsed(round.elapsedMs);
+      elapsed.textContent = formatSeconds(round.elapsedMs);
       const result = document.createElement('span');
       result.className = 'history-result';
       result.textContent = resultLabels[round.result];
@@ -205,7 +204,7 @@
       finishRound('timeout');
       return;
     }
-    const time = `${Math.ceil(remaining / 1000)} 秒`;
+    const time = formatSeconds(remaining);
     if (clock.textContent !== time) clock.textContent = time;
     progress.value = remaining / activeRound.limitMs;
     frame = requestAnimationFrame(tick);
@@ -253,6 +252,7 @@
     saveRounds();
     renderRound();
     keywordDialog.close();
+    toggleClock.focus({ preventScroll: true });
     lookupConfirmedWord();
   });
 
@@ -271,14 +271,17 @@
     saveRounds();
     if (!activeRound) renderRound();
     settingsDialog.close();
+    toggleClock.focus({ preventScroll: true });
   });
   document.addEventListener('fullscreenchange', () => {
     if (document.fullscreenElement && settingsDialog.open) settingsDialog.close();
   });
 
-  setup.addEventListener('submit', event => {
-    event.preventDefault();
-    if (activeRound) return;
+  function toggleTimer() {
+    if (activeRound) {
+      finishRound('win');
+      return;
+    }
     if (!confirmedWord) {
       openKeyword();
       return;
@@ -294,10 +297,18 @@
     };
     saveRounds();
     runTimer();
-  });
+  }
 
-  won.addEventListener('click', () => finishRound('win'));
-  failed.addEventListener('click', () => finishRound('loss'));
+  toggleClock.addEventListener('click', toggleTimer);
+  document.addEventListener('keydown', event => {
+    if (event.key !== ' ' || event.defaultPrevented || event.isComposing ||
+        event.altKey || event.ctrlKey || event.metaKey || event.shiftKey ||
+        keywordDialog.open || settingsDialog.open) return;
+    const control = event.target.closest?.('button, input, textarea, select, a[href], [contenteditable]:not([contenteditable="false"])');
+    if (control && control !== toggleClock) return;
+    event.preventDefault();
+    if (!event.repeat) toggleTimer();
+  });
 
   renderHistory();
   if (activeRound) runTimer();

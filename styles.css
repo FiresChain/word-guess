@@ -66,24 +66,21 @@ h1 { font-size:23px; letter-spacing:-.04em }
 .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap }
 #word { font-size:clamp(42px,6.2vw,98px); font-weight:850; line-height:1.25; overflow-wrap:anywhere }
 #word[data-length="long"] { font-size:clamp(26px,3.4vw,54px) }
+#toggle-clock { padding:0 8px; max-width:100%; background:transparent; border:0; color:inherit; touch-action:manipulation }
+#toggle-clock:hover { background:#ffffff0b }
+#clock-hint { margin-top:5px; color:#c7cdbd; font-size:13px }
 .timing { text-align:center; margin:0 0 18px }
 #clock { display:block; font:600 clamp(35px,4.8vw,76px)/1.16 var(--mono); color:var(--lime); letter-spacing:-.065em; font-variant-numeric:tabular-nums; margin-top:3px }
 progress { width:100%; height:5px; appearance:none; border:0; background:#49503f; border-radius:10px; overflow:hidden; accent-color:var(--lime) }
 progress::-webkit-progress-bar { background:#49503f }
 progress::-webkit-progress-value { background:var(--lime) }
 progress::-moz-progress-bar { background:var(--lime) }
-.control { margin-top:14px }
-#setup { margin-top:15px }
-#start { width:100% }
 dialog { width:min(360px, calc(100% - 32px)); border:1px solid var(--line); border-radius:12px; padding:24px; color:var(--ink); background:var(--panel); box-shadow:0 16px 60px #191d1933 }
 dialog::backdrop { background:#171c17a8 }
 dialog h2 { margin-bottom:16px; font-size:20px }
 dialog label:not(h2 label) { display:block; margin-bottom:6px; color:var(--muted); font-size:14px }
 .dialog-actions { margin-top:20px; display:flex; justify-content:flex-end; gap:8px }
 .primary { background:var(--orange); border-color:var(--orange); justify-content:center; gap:6px; min-height:45px; color:#231c11 }
-.primary svg { width:16px; height:16px }
-#play-actions { display:flex; gap:12px; margin-top:18px }
-#play-actions button { flex:1 }
 #lookup-status:not(:empty) { margin-top:8px }
 #results { margin:8px -4px 0; padding:4px; max-height:236px; overflow:auto }
 .result-option { text-align:left; display:block; width:100%; padding:7px 10px; overflow-wrap:anywhere }
