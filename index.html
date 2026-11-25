@@ -48,19 +48,20 @@
       <p id="history-empty" class="empty">还没有回合记录</p><ol id="history-list"></ol>
     </aside>
     <aside class="lookup panel" aria-labelledby="lookup-title">
-      <details id="lookup-handbook" open>
-        <summary class="section-heading"><svg aria-hidden="true"><use href="#book"/></svg><h2 id="lookup-title">查词手册</h2></summary>
+      <h2 id="lookup-title"><button id="lookup-handbook" type="button" class="section-heading" aria-expanded="true" aria-controls="lookup-body"><svg aria-hidden="true"><use href="#book"/></svg>查词手册</button></h2>
+      <div class="lookup-actions">
+        <button id="lookup-missing" type="button" title="将当前关键词加入本地词库">找不到</button>
+        <span id="lookup-recorded" role="status"></span>
+      </div>
+      <div id="lookup-body">
         <p id="lookup-status" role="status"></p>
         <div id="lookup-switcher" hidden>
           <div id="switcher-label">切换词条</div>
           <div id="results" role="group" aria-labelledby="switcher-label"></div>
         </div>
-        <div class="lookup-actions">
-          <button id="lookup-online" type="button" hidden>查找更多 Wikidata 词条</button>
-          <button id="lookup-missing" type="button" title="将当前关键词加入本地词库">找不到</button>
-        </div>
+        <button id="lookup-online" type="button" hidden>查找更多 Wikidata 词条</button>
         <article id="entry" aria-labelledby="entry-title" hidden></article>
-      </details>
+      </div>
     </aside>
   </main>
   <dialog id="keyword-dialog" aria-labelledby="keyword-title">

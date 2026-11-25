@@ -8,6 +8,8 @@
   const onlineButton = document.querySelector("#lookup-online");
 
   const handbook = document.querySelector("#lookup-handbook");
+  const handbookBody = document.querySelector("#lookup-body");
+  const recorded = document.querySelector("#lookup-recorded");
   const missingButton = document.querySelector("#lookup-missing");
 
   const wikidata = "https://www.wikidata.org";
@@ -384,13 +386,22 @@
     }
   }
 
+  function showHandbook(open) {
+    handbookBody.hidden = !open;
+    handbook.setAttribute("aria-expanded", String(open));
+  }
+
+  handbook.addEventListener("click", () => showHandbook(handbookBody.hidden));
   document.addEventListener("word-confirmed", event => {
-    handbook.open = true;
+    recorded.textContent = "";
+    showHandbook(true);
     lookupWord(event.detail);
   });
   document.addEventListener("dictionary-changed", () => {
     const { term } = currentLookup;
-    if (currentLookup.options.some(option => option.card.custom) || window.localDictionary.find(term)?.description) lookupWord(term);
+    const local = window.localDictionary.find(term);
+    if (!local) recorded.textContent = "";
+    if (currentLookup.options.some(option => option.card.custom) || local?.description) lookupWord(term);
   });
 
   missingButton.addEventListener("click", () => {
@@ -400,11 +411,14 @@
       if (!window.localDictionary.find(term)) {
         window.localDictionary.save({ keyword: term, description: "" });
       }
+      recorded.textContent = "已记录";
       if (hasResult) {
-        handbook.open = false;
+        showHandbook(false);
         document.querySelector("#toggle-clock").focus({ preventScroll: true });
       }
     } catch (error) {
+      recorded.textContent = "";
+      showHandbook(true);
       status.textContent = error.message;
     }
   });
