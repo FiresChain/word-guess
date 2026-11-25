@@ -51,17 +51,15 @@
     </aside>
     <aside class="lookup panel" aria-labelledby="lookup-title">
       <div class="section-heading"><svg aria-hidden="true"><use href="#book"/></svg><h2 id="lookup-title">查词手册</h2></div>
-      <form id="lookup-form" role="search" action="https://www.baike.com/search" method="get" target="_blank" rel="noopener noreferrer">
-        <input type="search" id="query" name="keyword" aria-label="在抖音百科查找词条" maxlength="100" placeholder="输入要查的词" value="囚牛" required>
-        <button type="submit" aria-label="搜索抖音百科（新标签页）" title="搜索抖音百科"><svg aria-hidden="true"><use href="#search"/></svg></button>
+      <form id="lookup-form" role="search" aria-label="查词手册">
+        <input type="search" id="query" aria-label="查找词条" aria-describedby="lookup-note" maxlength="100" placeholder="输入要查的词" value="囚牛" required>
+        <button type="submit" aria-label="搜索" title="搜索"><svg aria-hidden="true"><use href="#search"/></svg></button>
       </form>
-      <p class="lookup-note">搜索后在新标签页打开抖音百科。</p>
-      <article id="entry">
-        <h3>囚牛</h3>
-        <p>中国民间传说中，龙生九子之一。</p>
-        <dl><dt>读音</dt><dd>qiú niú</dd><dt>喜好</dt><dd>相传爱好音乐</dd><dt>传统形象</dt><dd>明代李东阳将胡琴琴头的兽形雕刻与囚牛联系起来</dd></dl>
-        <footer>本地编写 · 参考 <a href="https://www.shidianguji.com/book/HY1130/chapter/1kvmfclsw6ujm" target="_blank" rel="noopener noreferrer">李东阳《记龙生九子》</a></footer>
-      </article>
+      <p id="lookup-note">已收录词条无需连接 Wikidata。</p>
+      <p id="lookup-status" role="status"></p>
+      <div id="results" role="group" aria-label="匹配词条" hidden></div>
+      <article id="entry" aria-labelledby="entry-title" hidden></article>
+      <button id="lookup-online" type="button" hidden>查找更多 Wikidata 词条</button>
     </aside>
   </main>
 </body>
