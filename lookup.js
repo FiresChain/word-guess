@@ -66,7 +66,7 @@
     const heading = element("h3", title);
     heading.id = "entry-title";
     entry.append(heading);
-    if (description) entry.append(element("p", description));
+    if (description) entry.append(element("p", description, card.custom ? "custom-description" : ""));
     if (aliases?.length) entry.append(element("p", `别名：${aliases.join("、")}`, "aliases"));
     if (facts?.length) {
       const list = element("dl");
@@ -77,7 +77,9 @@
     }
 
     const source = element("footer");
-    if (id) {
+    if (card.custom) {
+      source.textContent = "本地词库";
+    } else if (id) {
       source.append(link(`Wikidata（${id}）`, `${wikidata}/wiki/${id}`), " · ", link(
         "CC0", `${wikidata}/wiki/Wikidata:Copyright/zh`
       ));
@@ -337,14 +339,20 @@
     }, `${prefix}暂时无法加载 Wikidata 资料。`, `${prefix}Wikidata 响应超时，请重试。`);
   }
 
-  document.addEventListener("word-confirmed", async event => {
-    const term = event.detail;
+  async function lookupWord(term) {
     cancelOnline();
     const lookup = { term, options: [], selected: null, localAvailable: false };
     currentLookup = lookup;
     renderOptions(lookup);
     renderCard();
     onlineButton.hidden = true;
+    const custom = window.localDictionary.find(term);
+    if (custom) {
+      lookup.selected = { card: { title: custom.keyword, description: custom.description, custom: true }, complete: true };
+      renderCard(lookup.selected.card);
+      status.textContent = "";
+      return;
+    }
     status.textContent = "正在查找已收录词条…";
 
     const catalog = await catalogReady;
@@ -358,6 +366,12 @@
     } else {
       searchOnline(lookup);
     }
+  }
+
+  document.addEventListener("word-confirmed", event => lookupWord(event.detail));
+  document.addEventListener("dictionary-changed", () => {
+    const { term, selected } = currentLookup;
+    if (selected?.card.custom || window.localDictionary.find(term)) lookupWord(term);
   });
 
   onlineButton.addEventListener("click", () => {
