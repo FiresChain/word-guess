@@ -25,8 +25,6 @@
   const historyList = document.querySelector('#history-list');
   const historyEmpty = document.querySelector('#history-empty');
   const historyCount = document.querySelector('#history-count');
-  const historyWins = document.querySelector('#history-wins');
-  const historyLosses = document.querySelector('#history-losses');
 
   const { history, active, preference } = loadRounds();
   let activeRound = active;
@@ -148,34 +146,24 @@
   }
 
   function renderHistory() {
-    let wins = 0;
     const items = document.createDocumentFragment();
 
     for (const round of history) {
-      if (round.result === 'win') wins += 1;
       const item = document.createElement('li');
       item.className = round.result === 'win' ? 'win' : 'loss';
-      const number = document.createElement('span');
-      number.className = 'history-round';
-      number.textContent = `第 ${round.number} 轮`;
       const entry = document.createElement('span');
       entry.className = 'history-word';
       entry.textContent = round.word;
-      const elapsed = document.createElement('span');
-      elapsed.className = 'history-time';
-      elapsed.textContent = formatSeconds(round.elapsedMs);
       const result = document.createElement('span');
       result.className = 'history-result';
-      result.textContent = resultLabels[round.result];
-      item.append(number, entry, result, elapsed);
+      result.textContent = round.result === 'win' ? `${round.elapsedMs / 1000}秒` : '未猜出';
+      item.append(entry, ' ', result);
       items.append(item);
     }
 
     historyList.replaceChildren(items);
     historyEmpty.hidden = history.length > 0;
     historyCount.textContent = String(history.length);
-    historyWins.textContent = String(wins);
-    historyLosses.textContent = String(history.length - wins);
   }
 
   function finishRound(result) {
