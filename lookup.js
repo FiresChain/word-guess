@@ -7,6 +7,7 @@
   const entry = document.querySelector("#entry");
   const onlineButton = document.querySelector("#lookup-online");
 
+  const handbook = document.querySelector("#lookup-handbook");
   const missingButton = document.querySelector("#lookup-missing");
 
   const wikidata = "https://www.wikidata.org";
@@ -69,7 +70,7 @@
     const heading = element("h3", title);
     heading.id = "entry-title";
     entry.append(heading);
-    if (description || card.custom) entry.append(element("p", description || "描述待补充", card.custom ? "custom-description" : ""));
+    if (description) entry.append(element("p", description, card.custom ? "custom-description" : ""));
     if (aliases?.length) entry.append(element("p", `别名：${aliases.join("、")}`, "aliases"));
     if (facts?.length) {
       const list = element("dl");
@@ -360,10 +361,7 @@
     renderCard();
     onlineButton.hidden = true;
     const custom = window.localDictionary.find(term);
-    missingButton.disabled = Boolean(custom);
-    missingButton.textContent = custom ? "已加入本地词库" : "找不到";
-    missingButton.title = custom ? "可在设置的本地词库中编辑" : "将当前关键词加入本地词库";
-    if (custom) {
+    if (custom?.description) {
       const option = { card: { title: custom.keyword, description: custom.description, custom: true }, complete: true };
       lookup.options.push(option);
       lookup.selected = option;
@@ -386,15 +384,26 @@
     }
   }
 
-  document.addEventListener("word-confirmed", event => lookupWord(event.detail));
+  document.addEventListener("word-confirmed", event => {
+    handbook.open = true;
+    lookupWord(event.detail);
+  });
   document.addEventListener("dictionary-changed", () => {
     const { term } = currentLookup;
-    if (currentLookup.options.some(option => option.card.custom) || window.localDictionary.find(term)) lookupWord(term);
+    if (currentLookup.options.some(option => option.card.custom) || window.localDictionary.find(term)?.description) lookupWord(term);
   });
 
   missingButton.addEventListener("click", () => {
     try {
-      window.localDictionary.save({ keyword: currentLookup.term, description: "" });
+      const hasResult = Boolean(currentLookup.selected);
+      const term = currentLookup.term;
+      if (!window.localDictionary.find(term)) {
+        window.localDictionary.save({ keyword: term, description: "" });
+      }
+      if (hasResult) {
+        handbook.open = false;
+        document.querySelector("#toggle-clock").focus({ preventScroll: true });
+      }
     } catch (error) {
       status.textContent = error.message;
     }

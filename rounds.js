@@ -283,7 +283,7 @@
     if (event.key !== ' ' || event.defaultPrevented || event.isComposing ||
         event.altKey || event.ctrlKey || event.metaKey || event.shiftKey ||
         keywordDialog.open || settingsDialog.open) return;
-    const control = event.target.closest?.('button, input, textarea, select, a[href], [contenteditable]:not([contenteditable="false"])');
+    const control = event.target.closest?.('button, summary, input, textarea, select, a[href], [contenteditable]:not([contenteditable="false"])');
     if (control && control !== toggleClock) return;
     event.preventDefault();
     if (!event.repeat) toggleTimer();
