@@ -18,6 +18,7 @@
   const cancelSettings = document.querySelector('#cancel-settings');
   const word = document.querySelector('#word');
   const clock = document.querySelector('#clock');
+  const stage = document.querySelector('.stage');
   const roundState = document.querySelector('#round-state');
   const progress = document.querySelector('#progress');
   const historyList = document.querySelector('#history-list');
@@ -101,6 +102,11 @@
     return `${(ms / 1000).toFixed(3)} 秒`;
   }
 
+  function setCountdownColor(remainingMs) {
+    const tone = remainingMs < 30000 ? 'urgent' : remainingMs < 60000 ? 'warning' : 'normal';
+    if (stage.dataset.timerTone !== tone) stage.dataset.timerTone = tone;
+  }
+
   function lookupConfirmedWord() {
     if (confirmedWord) document.dispatchEvent(new CustomEvent('word-confirmed', { detail: confirmedWord }));
   }
@@ -125,6 +131,7 @@
 
     if (finishedRound) {
       const remaining = round.limitMs - round.elapsedMs;
+      stage.dataset.timerTone = round.result === 'timeout' ? 'urgent' : 'result';
       roundState.dataset.state = round.result;
       roundState.textContent = round.result === 'timeout' ? resultLabels.timeout : '';
       clock.textContent = formatSeconds(round.result === 'timeout' ? 0 : round.elapsedMs);
@@ -134,6 +141,7 @@
 
     roundState.dataset.state = 'ready';
     roundState.textContent = '';
+    setCountdownColor(preferredDuration * 1000);
     clock.textContent = `${preferredDuration} 秒`;
     progress.value = 1;
   }
@@ -184,6 +192,7 @@
       finishRound('timeout');
       return;
     }
+    setCountdownColor(remaining);
     const time = formatSeconds(remaining);
     if (clock.textContent !== time) clock.textContent = time;
     progress.value = remaining / activeRound.limitMs;
