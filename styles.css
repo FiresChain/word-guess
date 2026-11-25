@@ -37,7 +37,7 @@ h1 { font-size:23px; letter-spacing:-.04em }
 .stats div { display:flex; flex-direction:column; padding:0 16px; gap:1px }
 .stats div+div { border-left:1px solid #d8dacf }
 .stats strong { font:650 34px/1.15 var(--mono) }
-.stats span,.empty,#lookup-status { font-size:13px; color:var(--muted) }
+.stats span,.empty,.lookup-note { font-size:13px; color:var(--muted) }
 .empty { text-align:center; padding:32px 0 15px }
 #history-list { list-style:none; padding:0; max-height:58vh; overflow:auto }
 #history-list li { display:grid; grid-template-columns:1fr auto; align-items:baseline; gap:3px 8px; border-bottom:1px solid var(--line); padding:13px 0; font-size:13px }
@@ -78,12 +78,7 @@ progress::-moz-progress-bar { background:var(--lime) }
 #lookup-form { margin-top:20px; display:flex; gap:6px }
 #lookup-form input { flex:1 }
 #lookup-form button { padding:0; width:44px; display:grid; place-items:center; background:var(--ink); border-color:var(--ink); color:white }
-#lookup-status:not(:empty) { margin-top:10px }
-#results:not(:empty) { margin-top:8px; max-height:230px; overflow:auto }
-.result-option { text-align:left; display:block; width:100%; padding:7px 10px; margin:4px 0 }
-.result-option strong,.result-option span { display:block }
-.result-option span { color:var(--muted); font-size:12px }
-.result-option[aria-pressed=true] { background:#f0f4e4; border-color:#a1ae86 }
+.lookup-note { margin-top:8px }
 #entry { overflow-wrap:anywhere; font-size:14px; line-height:1.7 }
 #entry:not(:empty) { margin-top:20px; padding-top:18px; border-top:1px solid var(--line) }
 #entry h3 { font-size:25px; line-height:1.3; margin-bottom:8px }
@@ -92,7 +87,6 @@ progress::-moz-progress-bar { background:var(--lime) }
 .lookup footer { margin-top:22px; padding-top:12px; border-top:1px solid var(--line); font-size:12px; color:var(--muted); overflow-wrap:anywhere }
 .lookup footer a { text-decoration:none }
 .lookup footer a:hover { text-decoration:underline }
-#lookup-source:not(:empty) { margin-bottom:5px }
 @media(max-width:1000px) {
   .desk { grid-template-columns:minmax(0,1fr) minmax(220px,.55fr) }
   .center { grid-column:1; grid-row:1 / 3 }
