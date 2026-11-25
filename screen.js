@@ -8,7 +8,7 @@
   let expandedInPage = false;
 
   function fitWord() {
-    if (!root.classList.contains('fullscreen-layout') || !editWord.clientHeight) return;
+    if (!editWord.clientHeight) return;
     // Measure the rendered text so mixed scripts, punctuation and wrapped lines all fit.
     let low = 1;
     let high = Math.ceil(editWord.clientHeight);

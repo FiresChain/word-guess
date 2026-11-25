@@ -122,7 +122,6 @@
     roundLabel.textContent = `第 ${round?.number ?? (history[0]?.number ?? 0) + 1} 轮`;
     const displayWord = round?.word ?? (confirmedWord || '请输入词条');
     word.textContent = displayWord;
-    word.dataset.length = Array.from(displayWord).length > 8 ? 'long' : 'short';
 
     if (activeRound) {
       roundState.dataset.state = 'running';
