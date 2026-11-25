@@ -14,6 +14,7 @@
   const settingsDialog = document.querySelector('#settings-dialog');
   const settingsForm = document.querySelector('#settings-form');
   const duration = document.querySelector('#duration');
+  const durationStatus = document.querySelector('#duration-status');
   const cancelSettings = document.querySelector('#cancel-settings');
   const word = document.querySelector('#word');
   const clock = document.querySelector('#clock');
@@ -237,11 +238,13 @@
 
   settings.addEventListener('click', () => {
     if (document.fullscreenElement || settingsDialog.open) return;
+    durationStatus.textContent = '';
     duration.value = String(preferredDuration);
     settingsDialog.showModal();
     duration.focus();
   });
   cancelSettings.addEventListener('click', () => settingsDialog.close());
+  duration.addEventListener('input', () => { durationStatus.textContent = ''; });
   settingsForm.addEventListener('submit', event => {
     event.preventDefault();
     const value = duration.valueAsNumber;
@@ -249,8 +252,7 @@
     preferredDuration = value;
     saveRounds();
     if (!activeRound) renderRound();
-    settingsDialog.close();
-    toggleClock.focus({ preventScroll: true });
+    durationStatus.textContent = activeRound ? '已保存，下轮生效' : '已保存';
   });
   document.addEventListener('fullscreenchange', () => {
     if (document.fullscreenElement && settingsDialog.open) settingsDialog.close();

@@ -3,10 +3,10 @@
 
   const dictionary = window.localDictionary;
   const dialog = document.querySelector('#settings-dialog');
-  const settingsForm = document.querySelector('#settings-form');
+  const timerPanel = document.querySelector('#timer-panel');
+  const timerTab = document.querySelector('#open-timer');
   const openDictionary = document.querySelector('#open-dictionary');
   const panel = document.querySelector('#dictionary-panel');
-  const title = document.querySelector('#dictionary-title');
   const editorTitle = document.querySelector('#dictionary-editor-title');
   const list = document.querySelector('#dictionary-list');
   const undescribed = document.querySelector('#dictionary-undescribed');
@@ -73,29 +73,39 @@
     empty.textContent = undescribed.checked ? '没有待补充描述的词条' : '还没有本地词条';
   }
 
-  function showSettings() {
-    panel.hidden = true;
-    settingsForm.hidden = false;
-    dialog.classList.remove('dictionary-open');
-    dialog.setAttribute('aria-labelledby', 'settings-title');
+  const tabs = [timerTab, openDictionary];
+
+  function showPage(tab) {
+    for (const item of tabs) {
+      const active = item === tab;
+      item.setAttribute('aria-selected', String(active));
+      item.tabIndex = active ? 0 : -1;
+    }
+    const showDictionary = tab === openDictionary;
+    timerPanel.hidden = showDictionary;
+    panel.hidden = !showDictionary;
+    if (showDictionary) {
+      try {
+        renderEntries();
+      } catch (error) {
+        list.replaceChildren();
+        empty.hidden = true;
+        showStatus(error.message, true);
+      }
+    }
   }
 
-  openDictionary.addEventListener('click', () => {
-    settingsForm.hidden = true;
-    panel.hidden = false;
-    dialog.classList.add('dictionary-open');
-    dialog.setAttribute('aria-labelledby', 'dictionary-title');
-    editEntry();
-    showStatus();
-    try {
-      renderEntries();
-    } catch {
-      list.replaceChildren();
-      empty.hidden = true;
-      showStatus('无法读取本地词库，请检查当前浏览器的本地存储。', true);
-    }
-    title.focus();
-  });
+  for (const tab of tabs) {
+    tab.addEventListener('click', () => showPage(tab));
+    tab.addEventListener('keydown', event => {
+      if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) return;
+      event.preventDefault();
+      const next = event.key === 'Home' ? timerTab : event.key === 'End' ? openDictionary
+        : tabs[1 - tabs.indexOf(tab)];
+      showPage(next);
+      next.focus();
+    });
+  }
 
   undescribed.addEventListener('change', () => {
     try {
@@ -105,12 +115,11 @@
     }
   });
 
-  document.querySelector('#back-settings').addEventListener('click', () => {
-    showSettings();
-    openDictionary.focus();
-  });
   dialog.addEventListener('close', () => {
-    if (!dialog.open) showSettings();
+    if (dialog.open) return;
+    showPage(timerTab);
+    editEntry();
+    showStatus();
   });
 
   document.querySelector('#dictionary-new').addEventListener('click', () => {

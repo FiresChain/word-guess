@@ -72,65 +72,70 @@
     </form>
   </dialog>
   <dialog id="settings-dialog" aria-labelledby="settings-title">
-    <form id="settings-form">
-      <h2 id="settings-title">时间设置</h2>
-      <label for="duration">每轮限时（秒）</label>
-      <input id="duration" type="number" min="1" max="3600" step="1" value="100" required>
-      <div class="dialog-actions settings-actions">
-        <button class="screen" id="open-dictionary" type="button" aria-controls="dictionary-panel"><svg aria-hidden="true"><use href="#book"/></svg>本地词库</button>
-        <button id="cancel-settings" type="button">取消</button>
-        <button class="primary" type="submit">保存</button>
+    <header class="settings-header">
+      <h2 id="settings-title">设置</h2>
+      <button id="cancel-settings" type="button">关闭</button>
+    </header>
+    <div class="settings-layout">
+      <div class="settings-nav" role="tablist" aria-label="设置分类" aria-orientation="vertical">
+        <button type="button" id="open-timer" role="tab" aria-controls="timer-panel" aria-selected="true">倒计时设置</button>
+        <button type="button" id="open-dictionary" role="tab" aria-controls="dictionary-panel" aria-selected="false" tabindex="-1">本地词库</button>
       </div>
-    </form>
-    <section id="dictionary-panel" hidden>
-      <header class="dictionary-header">
-        <h2 id="dictionary-title" tabindex="-1">本地词库</h2>
-        <button id="back-settings" type="button">返回设置</button>
-      </header>
-      <p class="dictionary-note">词条保存在当前浏览器，查词时优先显示本地词条。</p>
-      <div class="dictionary-workspace">
-        <section class="dictionary-entries" aria-labelledby="dictionary-list-title">
-          <div class="dictionary-list-header">
-            <h3 id="dictionary-list-title">已保存词条</h3>
-            <button id="dictionary-new" type="button">新增</button>
-          </div>
-          <label class="dictionary-filter"><input id="dictionary-undescribed" type="checkbox">仅看无描述</label>
-          <p id="dictionary-empty" class="dictionary-note">还没有本地词条</p>
-          <ul id="dictionary-list"></ul>
-        </section>
-        <form id="dictionary-form" aria-labelledby="dictionary-editor-title">
-          <h3 id="dictionary-editor-title">新增词条</h3>
-          <label for="dictionary-keyword">关键词</label>
-          <input id="dictionary-keyword" type="text" maxlength="40" autocomplete="off" required>
-          <label for="dictionary-description">描述</label>
-          <textarea id="dictionary-description" rows="5"></textarea>
-          <div id="dictionary-edit-actions" class="dictionary-edit-actions">
-            <button id="dictionary-delete" class="dictionary-danger" type="button" hidden>删除词条</button>
-            <button class="primary" type="submit">保存词条</button>
-          </div>
-          <div id="dictionary-delete-confirmation" hidden>
-            <p id="dictionary-delete-question"></p>
-            <div class="dictionary-edit-actions">
-              <button id="dictionary-cancel-delete" type="button" aria-describedby="dictionary-delete-question">取消</button>
-              <button id="dictionary-confirm-delete" class="dictionary-danger" type="button" aria-describedby="dictionary-delete-question">确认删除</button>
-            </div>
-          </div>
+      <section id="timer-panel" class="settings-page" role="tabpanel" aria-labelledby="open-timer">
+        <h3>倒计时设置</h3>
+        <form id="settings-form">
+          <label for="duration">每轮限时（秒）</label>
+          <input id="duration" type="number" min="1" max="3600" step="1" value="100" required>
+          <div class="timer-actions"><button class="primary" type="submit">保存</button><span id="duration-status" role="status"></span></div>
         </form>
-      </div>
-      <p id="dictionary-status" role="status"></p>
-      <footer class="dictionary-transfer">
-        <div class="dictionary-transfer-actions">
-          <button id="dictionary-import" type="button">导入 JSON</button>
-          <input id="dictionary-file" type="file" accept=".json,application/json" hidden>
-          <button id="dictionary-export" type="button">导出 JSON</button>
+      </section>
+      <section id="dictionary-panel" class="settings-page" role="tabpanel" aria-labelledby="open-dictionary" hidden>
+        <h3>本地词库</h3>
+        <p class="dictionary-note">词条保存在当前浏览器，查词时优先显示本地词条。</p>
+        <div class="dictionary-workspace">
+          <section class="dictionary-entries" aria-labelledby="dictionary-list-title">
+            <div class="dictionary-list-header">
+              <h3 id="dictionary-list-title">已保存词条</h3>
+              <button id="dictionary-new" type="button">新增</button>
+            </div>
+            <label class="dictionary-filter"><input id="dictionary-undescribed" type="checkbox">仅看无描述</label>
+            <p id="dictionary-empty" class="dictionary-note">还没有本地词条</p>
+            <ul id="dictionary-list"></ul>
+          </section>
+          <form id="dictionary-form" aria-labelledby="dictionary-editor-title">
+            <h3 id="dictionary-editor-title">新增词条</h3>
+            <label for="dictionary-keyword">关键词</label>
+            <input id="dictionary-keyword" type="text" maxlength="40" autocomplete="off" required>
+            <label for="dictionary-description">描述</label>
+            <textarea id="dictionary-description" rows="5"></textarea>
+            <div id="dictionary-edit-actions" class="dictionary-edit-actions">
+              <button id="dictionary-delete" class="dictionary-danger" type="button" hidden>删除词条</button>
+              <button class="primary" type="submit">保存词条</button>
+            </div>
+            <div id="dictionary-delete-confirmation" hidden>
+              <p id="dictionary-delete-question"></p>
+              <div class="dictionary-edit-actions">
+                <button id="dictionary-cancel-delete" type="button" aria-describedby="dictionary-delete-question">取消</button>
+                <button id="dictionary-confirm-delete" class="dictionary-danger" type="button" aria-describedby="dictionary-delete-question">确认删除</button>
+              </div>
+            </div>
+          </form>
         </div>
-        <p class="dictionary-note">导入会添加新词条，并覆盖同名词条。</p>
-        <details class="dictionary-note">
-          <summary>导入格式</summary>
-          <pre><code>[{"keyword":"囚牛","description":"龙生九子之一，爱好音乐。"}]</code></pre>
-        </details>
-      </footer>
-    </section>
+        <p id="dictionary-status" role="status"></p>
+        <footer class="dictionary-transfer">
+          <div class="dictionary-transfer-actions">
+            <button id="dictionary-import" type="button">导入 JSON</button>
+            <input id="dictionary-file" type="file" accept=".json,application/json" hidden>
+            <button id="dictionary-export" type="button">导出 JSON</button>
+          </div>
+          <p class="dictionary-note">导入会添加新词条，并覆盖同名词条。</p>
+          <details class="dictionary-note">
+            <summary>导入格式</summary>
+            <pre><code>[{"keyword":"囚牛","description":"龙生九子之一，爱好音乐。"}]</code></pre>
+          </details>
+        </footer>
+      </section>
+    </div>
   </dialog>
 </body>
 </html>
