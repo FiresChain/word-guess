@@ -1,8 +1,6 @@
 (() => {
   "use strict";
 
-  const form = document.querySelector("#lookup-form");
-  const query = document.querySelector("#query");
   const status = document.querySelector("#lookup-status");
   const results = document.querySelector("#results");
   const entry = document.querySelector("#entry");
@@ -339,15 +337,8 @@
     }, `${prefix}暂时无法加载 Wikidata 资料。`, `${prefix}Wikidata 响应超时，请重试。`);
   }
 
-  form.addEventListener("submit", async event => {
-    event.preventDefault();
-    const term = query.value.trim();
-    if (!term) {
-      query.setCustomValidity("请输入要查的词。");
-      query.reportValidity();
-      return;
-    }
-
+  document.addEventListener("word-confirmed", async event => {
+    const term = event.detail;
     cancelOnline();
     const lookup = { term, options: [], selected: null, localAvailable: false };
     currentLookup = lookup;
@@ -369,7 +360,6 @@
     }
   });
 
-  query.addEventListener("input", () => query.setCustomValidity(""));
   onlineButton.addEventListener("click", () => {
     const selected = currentLookup.selected;
     if (selected && !selected.complete) requestDetails(currentLookup, selected);
