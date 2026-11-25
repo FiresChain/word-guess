@@ -24,7 +24,7 @@ input,textarea { background:#fff; border:1px solid #b9bcb1; border-radius:6px; m
 .logo svg { width:26px; height:26px; stroke-width:2.6 }
 h1 { font-size:23px; letter-spacing:-.04em }
 .mast-actions { display:flex; align-items:center; gap:8px }
-:fullscreen #settings { display:none }
+:fullscreen #settings,.fullscreen-layout #settings { display:none }
 @media (display-mode: fullscreen) { #settings { display:none } }
 .screen { font-size:14px; background:transparent }
 .desk { display:grid; gap:clamp(14px,1.5vw,26px); grid-template-columns:minmax(195px,.86fr) minmax(0,2.5fr) minmax(225px,1fr); align-items:start; padding-block:clamp(24px,3.8vw,64px) }

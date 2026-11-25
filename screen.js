@@ -5,6 +5,8 @@
   const word = document.querySelector('#word');
   const displayMode = matchMedia('(display-mode: fullscreen)');
 
+  let expandedInPage = false;
+
   function fitWord() {
     if (!root.classList.contains('fullscreen-layout') || !editWord.clientHeight) return;
     // Measure the rendered text so mixed scripts, punctuation and wrapped lines all fit.
@@ -20,8 +22,8 @@
   }
 
   function syncFullscreen() {
-    root.classList.toggle('fullscreen-layout', Boolean(document.fullscreenElement) || displayMode.matches);
-    button.querySelector('span').textContent = document.fullscreenElement ? '退出全屏' : '全屏';
+    root.classList.toggle('fullscreen-layout', expandedInPage || Boolean(document.fullscreenElement) || displayMode.matches);
+    button.querySelector('span').textContent = expandedInPage || document.fullscreenElement ? '退出全屏' : '全屏';
     fitWord();
   }
 
@@ -31,14 +33,26 @@
   displayMode.addEventListener('change', syncFullscreen);
   syncFullscreen();
 
-  if (!document.fullscreenEnabled) return;
+  document.addEventListener('keydown', event => {
+    if (expandedInPage && event.key === 'Escape' && !document.querySelector('dialog[open]')) {
+      expandedInPage = false;
+      syncFullscreen();
+    }
+  });
   button.hidden = false;
   button.addEventListener('click', async () => {
+    if (expandedInPage) {
+      expandedInPage = false;
+      syncFullscreen();
+      return;
+    }
     try {
       if (document.fullscreenElement) await document.exitFullscreen();
       else await root.requestFullscreen();
     } catch {
-      button.hidden = true;
+      // Embedded browsers may decline native fullscreen. Expand within the tab instead.
+      expandedInPage = true;
+      syncFullscreen();
     }
   });
 })();
